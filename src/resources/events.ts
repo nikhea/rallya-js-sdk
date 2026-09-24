@@ -92,7 +92,7 @@ export class EventsResource {
     );
   }
 
-  uploadCover(
+  async uploadCover(
     orgIdOrSlug: string,
     eventIdOrSlug: string,
     file: File | Blob | Buffer,
@@ -104,7 +104,7 @@ export class EventsResource {
     );
   }
 
-  uploadImages(
+  async uploadImages(
     orgIdOrSlug: string,
     eventIdOrSlug: string,
     file: File | Blob | Buffer,

@@ -16,7 +16,7 @@ export class CheckinResource {
     );
   }
 
-  scanBatch(orgIdOrSlug: string, eventIdOrSlug: string, codes: string[]): Promise<{ results: ScanResult[] }> {
+  async scanBatch(orgIdOrSlug: string, eventIdOrSlug: string, codes: string[]): Promise<{ results: ScanResult[] }> {
     if (codes.length > 50) throw new Error("batch check-in limited to 50 codes");
     return this.client.request<{ results: ScanResult[] }>(
       `orgs/${RallyaClient.seg(orgIdOrSlug)}/events/${RallyaClient.seg(eventIdOrSlug)}/checkin/batch`,
