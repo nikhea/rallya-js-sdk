@@ -1,0 +1,39 @@
+{
+  "name": "@rallya/sdk",
+  "version": "0.1.0",
+  "description": "JavaScript/TypeScript SDK for the Rallya event platform API",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    },
+    "./node": {
+      "import": "./dist/node.js",
+      "require": "./dist/node.cjs",
+      "types": "./dist/node.d.ts"
+    }
+  },
+  "files": ["dist", "README.md", "LICENSE"],
+  "scripts": {
+    "gen": "openapi-typescript ../rallya/docs/swagger.json -o src/generated/schema.ts && cp ../rallya/docs/swagger.json openapi.snapshot.json",
+    "gen:check": "node scripts/check-drift.mjs",
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "node --check src/index.ts && tsc --noEmit"
+  },
+  "keywords": ["rallya", "events", "ticketing", "sdk", "typescript"],
+  "license": "UNLICENSED",
+  "engines": { "node": ">=18" },
+  "devDependencies": {
+    "openapi-typescript": "^7.4.0",
+    "tsup": "^8.3.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  }
+}
