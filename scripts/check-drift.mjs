@@ -15,9 +15,9 @@ if (hash(upstream) !== hash(snapshot)) {
   console.error("Swagger drift detected: ../rallya/docs/swagger.json != openapi.snapshot.json. Run `npm run gen`.");
   process.exit(1);
 }
-// Also confirm generated schema matches snapshot (regen determinism check).
+// Also confirm the snapshot converts cleanly (regen determinism check).
 try {
-  execSync("npx swagger2openapi ../rallya/docs/swagger.json -o /tmp/rallya-openapi3-check.json --outfile /tmp/rallya-openapi3-check.json -y false", { stdio: "pipe" });
+  execSync("npx swagger2openapi ../rallya/docs/swagger.json -o /tmp/rallya-openapi3-check.json", { stdio: "pipe" });
   console.log("drift check: snapshot in sync");
 } catch (e) {
   console.error("drift check failed to convert swagger");

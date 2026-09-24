@@ -24,7 +24,7 @@
     "LICENSE"
   ],
   "scripts": {
-    "gen": "swagger2openapi ../rallya/docs/swagger.json -o openapi3.json --outfile openapi3.json -y false && openapi-typescript openapi3.json -o src/generated/schema.ts && cp ../rallya/docs/swagger.json openapi.snapshot.json",
+    "gen": "swagger2openapi ../rallya/docs/swagger.json -o openapi3.json && openapi-typescript openapi3.json -o src/generated/schema.ts && cp ../rallya/docs/swagger.json openapi.snapshot.json",
     "gen:check": "node scripts/check-drift.mjs",
     "build": "tsup",
     "typecheck": "tsc --noEmit",
