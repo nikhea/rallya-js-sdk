@@ -45,7 +45,7 @@ describe("errors", () => {
   it("exposes retry-after on 429", async () => {
     const fetchImpl = vi.fn(async () => jsonResponse({ error: "rate limited" }, 429, { "retry-after": "2" }));
     const { client } = makeClient({ fetchImpl, tokens: { accessToken: "a", refreshToken: "r" } });
-    const err = await client.auth.me().catch((e) => e as RallyaError);
+    const err = await client.auth.me().catch((e: unknown) => e) as RallyaError;
     expect(err).toBeInstanceOf(RallyaError);
     expect(err.retryAfterMs).toBe(2000);
   });
@@ -101,7 +101,7 @@ describe("resources", () => {
   it("auto-generates idempotency key on order create", async () => {
     let sentBody: { ticketTypeId: string; quantity: number; idempotencyKey?: string } | null = null;
     const fetchImpl = vi.fn(async (_u: string | URL | Request, init?: RequestInit) => {
-      sentBody = JSON.parse(String(init?.body)) as typeof sentBody;
+      sentBody = JSON.parse(String(init?.body)) as NonNullable<typeof sentBody>;
       return jsonResponse({ id: "o1" }, 200);
     });
     const { client } = makeClient({
@@ -109,7 +109,7 @@ describe("resources", () => {
       tokens: { accessToken: "a", refreshToken: "r" },
     });
     await client.orders.create("event-slug", { ticketTypeId: "t1", quantity: 2 });
-    expect(sentBody?.idempotencyKey).toBeTruthy();
+    expect((sentBody as { idempotencyKey?: string } | null)?.idempotencyKey).toBeTruthy();
   });
 
   it("rejects batch check-in over 50 codes without network", async () => {
@@ -160,5 +160,88 @@ describe("resources", () => {
     });
     await client.events.listPublic();
     expect(authHeader).toBeNull();
+  });
+});
+
+describe("apiKey", () => {
+  function makeKeyClient(opts: {
+    apiKey: string | (() => string | null | Promise<string | null>);
+    fetchImpl: typeof fetch;
+    onAuthFailure?: () => void;
+  }) {
+    return new RallyaClient({
+      baseUrl: "http://localhost:8080/api/v1",
+      apiKey: opts.apiKey,
+      onAuthFailure: opts.onAuthFailure,
+      fetchImpl: opts.fetchImpl,
+    });
+  }
+
+  it("sends X-API-Key without Authorization and without refresh on 401", async () => {
+    let seen: Record<string, string> = {};
+    const fetchImpl = vi.fn(async (_u: string | URL | Request, init?: RequestInit) => {
+      seen = (init?.headers as Record<string, string>) ?? {};
+      return jsonResponse({ error: "unauthorized" }, 401);
+    });
+    const onAuthFailure = vi.fn();
+    const client = makeKeyClient({
+      apiKey: "rk_live_testsecret",
+      fetchImpl: fetchImpl as unknown as typeof fetch,
+      onAuthFailure,
+    });
+    await expect(client.orgs.get("acme")).rejects.toBeInstanceOf(RallyaError);
+    expect(seen["X-API-Key"]).toBe("rk_live_testsecret");
+    expect(seen["Authorization"]).toBeUndefined();
+    expect(fetchImpl).toHaveBeenCalledTimes(1);
+    expect(onAuthFailure).toHaveBeenCalled();
+  });
+
+  it("suppresses X-API-Key on public routes", async () => {
+    let seen: Record<string, string> = { "X-API-Key": "unset" };
+    const fetchImpl = vi.fn(async (_u: string | URL | Request, init?: RequestInit) => {
+      seen = (init?.headers as Record<string, string>) ?? {};
+      return jsonResponse({ items: [], total: 0 }, 200);
+    });
+    const client = makeKeyClient({
+      apiKey: "rk_live_testsecret",
+      fetchImpl: fetchImpl as unknown as typeof fetch,
+    });
+    await client.events.listPublic();
+    expect(seen["X-API-Key"]).toBeUndefined();
+  });
+
+  it("supports function providers", async () => {
+    let seen = "";
+    const fetchImpl = vi.fn(async (_u: string | URL | Request, init?: RequestInit) => {
+      seen = (init?.headers as Record<string, string>)["X-API-Key"];
+      return jsonResponse({ id: "x" }, 200);
+    });
+    const client = makeKeyClient({
+      apiKey: () => "rk_live_from_fn",
+      fetchImpl: fetchImpl as unknown as typeof fetch,
+    });
+    await client.orgs.get("acme");
+    expect(seen).toBe("rk_live_from_fn");
+  });
+
+  it("rejects ambiguous or missing auth config", () => {
+    const fetchImpl = (async () => jsonResponse({}, 200)) as unknown as typeof fetch;
+    expect(
+      () =>
+        new RallyaClient({
+          baseUrl: "http://localhost:8080/api/v1",
+          apiKey: "rk_live_x",
+          getTokens: () => null,
+          setTokens: () => {},
+          fetchImpl,
+        }),
+    ).toThrow(/not both/);
+    expect(
+      () =>
+        new RallyaClient({
+          baseUrl: "http://localhost:8080/api/v1",
+          fetchImpl,
+        }),
+    ).toThrow(/provide apiKey or TokenStore/);
   });
 });

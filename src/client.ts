@@ -23,8 +23,15 @@ export type TokenStore = {
   setTokens: (t: TokenPair | null) => void | Promise<void>;
 };
 
-export interface RallyaClientOptions extends TokenStore {
+export type ApiKeyProvider = string | (() => string | null | Promise<string | null>);
+
+export interface RallyaClientOptions {
   baseUrl: string;
+  /** User sessions (browser/mobile). Exactly one of TokenStore / apiKey. */
+  getTokens?: TokenStore["getTokens"];
+  setTokens?: TokenStore["setTokens"];
+  /** Server-to-server org key (`rk_live_*`). Exactly one of apiKey / TokenStore. */
+  apiKey?: ApiKeyProvider;
   onAuthFailure?: () => void;
   fetchImpl?: typeof fetch;
 }
@@ -84,8 +91,9 @@ async function throwForStatus(res: Response): Promise<never> {
 
 export class RallyaClient {
   readonly baseUrl: string;
-  private readonly getTokens: TokenStore["getTokens"];
-  private readonly setTokens: TokenStore["setTokens"];
+  private readonly getTokens?: TokenStore["getTokens"];
+  private readonly setTokens?: TokenStore["setTokens"];
+  private readonly apiKey?: ApiKeyProvider;
   private readonly onAuthFailure?: () => void;
   private readonly fetchImpl: typeof fetch;
   private refreshPromise: Promise<TokenPair> | null = null;
@@ -104,8 +112,20 @@ export class RallyaClient {
 
   constructor(opts: RallyaClientOptions) {
     this.baseUrl = normalizeBaseUrl(opts.baseUrl);
+    const hasStore = opts.getTokens !== undefined || opts.setTokens !== undefined;
+    const hasKey = opts.apiKey !== undefined;
+    if (hasStore && hasKey) {
+      throw new Error("RallyaClient: use apiKey OR TokenStore (getTokens/setTokens), not both");
+    }
+    if (hasStore && (opts.getTokens === undefined || opts.setTokens === undefined)) {
+      throw new Error("RallyaClient: getTokens and setTokens are required together");
+    }
+    if (!hasStore && !hasKey) {
+      throw new Error("RallyaClient: provide apiKey or TokenStore (getTokens/setTokens)");
+    }
     this.getTokens = opts.getTokens;
     this.setTokens = opts.setTokens;
+    this.apiKey = opts.apiKey;
     this.onAuthFailure = opts.onAuthFailure;
     this.fetchImpl =
       opts.fetchImpl ?? ((...args: Parameters<typeof fetch>) => fetch(...args));
@@ -124,6 +144,25 @@ export class RallyaClient {
 
   /** Low-level request. Prefer typed resource methods. */
   async request<T>(path: string, opts: RequestOptions): Promise<T> {
+    // API-key mode: static per-org secret, no refresh cycle.
+    if (this.apiKey !== undefined) {
+      const key = typeof this.apiKey === "string" ? this.apiKey : await this.apiKey();
+      const headers: Record<string, string> = { ...(opts.headers ?? {}) };
+      if (opts.body !== undefined) headers["Content-Type"] = "application/json";
+      if (key && opts.auth !== false) headers["X-API-Key"] = key;
+      const res = await this.fetchImpl(buildUrl(this.baseUrl, path.replace(/^\/+/, ""), opts.query), {
+        method: opts.method,
+        headers,
+        body: opts.formData ?? (opts.body !== undefined ? JSON.stringify(opts.body) : undefined),
+      });
+      if (res.status === 401 && opts.auth !== false) this.onAuthFailure?.();
+      if (!res.ok) return throwForStatus(res);
+      if (res.status === 204) return undefined as T;
+      const text = await res.text();
+      if (!text) return undefined as T;
+      return JSON.parse(text) as T;
+    }
+
     const doFetch = async (accessToken?: string): Promise<Response> => {
       const headers: Record<string, string> = { ...(opts.headers ?? {}) };
       if (opts.body !== undefined) headers["Content-Type"] = "application/json";
@@ -135,7 +174,7 @@ export class RallyaClient {
       });
     };
 
-    const tokens = opts.auth === false ? null : await this.getTokens();
+    const tokens = opts.auth === false ? null : await this.getTokens!();
     let res = await doFetch(tokens?.accessToken);
     if (res.status === 401 && opts.auth !== false && opts.retryAuth !== false && tokens?.refreshToken) {
       try {
@@ -164,7 +203,7 @@ export class RallyaClient {
         retryAuth: false,
       })
         .then(async (pair) => {
-          await this.setTokens(pair);
+          await this.setTokens!(pair);
           return pair;
         })
         .finally(() => {
@@ -176,7 +215,7 @@ export class RallyaClient {
 
   private async failAuth(): Promise<void> {
     try {
-      await this.setTokens(null);
+      await this.setTokens?.(null);
     } finally {
       this.onAuthFailure?.();
     }
