@@ -216,6 +216,37 @@ await client.checkin.revert("acme", "fest-2026", attendeeId);
 await client.checkin.stats("acme", "fest-2026"); // { registered, checkedIn, ... }
 ```
 
+### Kits (`client.kits`)
+
+Named kit types per event (merch/welcome packs) with per-attendee
+collections. Collects require a `CHECKED_IN` attendee (`422` otherwise);
+reverting a check-in with active collections fails until voided:
+
+```ts
+await client.kits.create("acme", "fest-2026", { name: "VIP pack", quantityTotal: 100 });
+await client.kits.list("acme", "fest-2026"); // with pending/collected/voided/remaining
+await client.kits.collect("acme", "fest-2026", "kit_123", {
+  attendeeId, idempotencyKey: "kit-req-001", // optional; reserve: true holds PENDING
+});
+await client.kits.markCollected("acme", "fest-2026", collectionId); // PENDING → COLLECTED
+await client.kits.void("acme", "fest-2026", collectionId);          // frees re-issue
+await client.kits.listCollections("acme", "fest-2026", { status: "COLLECTED" });
+```
+
+### Subscriptions (`client.subscriptions`)
+
+Org tiers (FREE/PRO/SCALE) gating organizer-side quotas and features.
+Attendee checkout stays one-off. Over-quota writes fail `402`
+(`UPGRADE_REQUIRED`); downgrades/cancels land at period end via the portal:
+
+```ts
+await client.subscriptions.listPlans(); // public catalog with limits + prices
+await client.subscriptions.get("acme"); // absent subscription reads FREE
+const { url } = await client.subscriptions.checkout("acme", "PRO"); // OWNER
+window.location.href = url;
+const { url: portal } = await client.subscriptions.portal("acme");  // OWNER
+```
+
 ### Audit / Admin / Health
 
 ```ts
