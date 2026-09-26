@@ -203,6 +203,59 @@ describe("kits", () => {
   });
 });
 
+describe("subscriptions", () => {
+  it("fetches the public catalog without auth", async () => {
+    let authHeader: string | null = "unset";
+    const fetchImpl = vi.fn(async (_u: string | URL | Request, init?: RequestInit) => {
+      authHeader = (init?.headers as Record<string, string>)["Authorization"] ?? null;
+      return jsonResponse(
+        [{ plan: "FREE", limits: { maxEvents: 3 } }, { plan: "PRO" }, { plan: "SCALE" }],
+        200,
+      );
+    });
+    const { client } = makeClient({
+      fetchImpl: fetchImpl as unknown as typeof fetch,
+      tokens: { accessToken: "a", refreshToken: "r" },
+    });
+    const tiers = await client.subscriptions.listPlans();
+    expect(tiers).toHaveLength(3);
+    expect(authHeader).toBeNull();
+  });
+
+  it("builds checkout and portal URLs with encoded segments", async () => {
+    const seen: string[] = [];
+    const fetchImpl = vi.fn(async (url: string | URL | Request, init?: RequestInit) => {
+      seen.push(`${init?.method} ${String(url)} :: ${String(init?.body ?? "")}`);
+      return jsonResponse({ url: "https://checkout/session", sessionId: "cs_1" }, 201);
+    });
+    const { client } = makeClient({
+      fetchImpl: fetchImpl as unknown as typeof fetch,
+      tokens: { accessToken: "a", refreshToken: "r" },
+    });
+    await client.subscriptions.checkout("acme", "PRO");
+    await client.subscriptions.portal("acme");
+    await client.subscriptions.get("acme");
+    expect(seen[0]).toContain("/orgs/acme/subscription/checkout");
+    expect(seen[0]).toContain('"plan":"PRO"');
+    expect(seen[1]).toContain("/orgs/acme/subscription/portal");
+    expect(seen[2]).toContain("GET http://localhost:8080/api/v1/orgs/acme/subscription");
+  });
+
+  it("surfaces billing error codes", async () => {
+    const fetchImpl = vi.fn(async () =>
+      jsonResponse({ error: "subscription billing unavailable", code: "BILLING_UNAVAILABLE" }, 503),
+    );
+    const { client } = makeClient({
+      fetchImpl: fetchImpl as unknown as typeof fetch,
+      tokens: { accessToken: "a", refreshToken: "r" },
+    });
+    await expect(client.subscriptions.portal("acme")).rejects.toMatchObject({
+      status: 503,
+      code: "BILLING_UNAVAILABLE",
+    });
+  });
+});
+
 describe("apiKey", () => {
   function makeKeyClient(opts: {
     apiKey: string | (() => string | null | Promise<string | null>);
