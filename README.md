@@ -216,6 +216,23 @@ await client.checkin.revert("acme", "fest-2026", attendeeId);
 await client.checkin.stats("acme", "fest-2026"); // { registered, checkedIn, ... }
 ```
 
+### Kits (`client.kits`)
+
+Named kit types per event (merch/welcome packs) with per-attendee
+collections. Collects require a `CHECKED_IN` attendee (`422` otherwise);
+reverting a check-in with active collections fails until voided:
+
+```ts
+await client.kits.create("acme", "fest-2026", { name: "VIP pack", quantityTotal: 100 });
+await client.kits.list("acme", "fest-2026"); // with pending/collected/voided/remaining
+await client.kits.collect("acme", "fest-2026", "kit_123", {
+  attendeeId, idempotencyKey: "kit-req-001", // optional; reserve: true holds PENDING
+});
+await client.kits.markCollected("acme", "fest-2026", collectionId); // PENDING → COLLECTED
+await client.kits.void("acme", "fest-2026", collectionId);          // frees re-issue
+await client.kits.listCollections("acme", "fest-2026", { status: "COLLECTED" });
+```
+
 ### Audit / Admin / Health
 
 ```ts

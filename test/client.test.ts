@@ -163,6 +163,46 @@ describe("resources", () => {
   });
 });
 
+describe("kits", () => {
+  it("builds kit collection URLs with encoded segments", async () => {
+    const seen: string[] = [];
+    const fetchImpl = vi.fn(async (url: string | URL | Request, init?: RequestInit) => {
+      seen.push(`${init?.method} ${String(url)} :: ${String(init?.body ?? "")}`);
+      if (String(url).endsWith("/kits") && init?.method === "POST") {
+        return jsonResponse({ id: "k1", remaining: 2 }, 201);
+      }
+      return jsonResponse({ id: "c1", status: "COLLECTED" }, 201);
+    });
+    const { client } = makeClient({
+      fetchImpl: fetchImpl as unknown as typeof fetch,
+      tokens: { accessToken: "a", refreshToken: "r" },
+    });
+    await client.kits.create("acme", "fest-2026", { name: "VIP pack", quantityTotal: 2 });
+    await client.kits.collect("acme", "fest-2026", "k1", { attendeeId: "a1", idempotencyKey: "k-1" });
+    await client.kits.listCollections("acme", "fest-2026", { status: "COLLECTED" });
+    expect(seen[0]).toContain("POST http://localhost:8080/api/v1/orgs/acme/events/fest-2026/kits");
+    expect(seen[1]).toContain("/kits/k1/collect");
+    expect(seen[1]).toContain('"idempotencyKey":"k-1"');
+    expect(seen[2]).toContain("/kit-collections?status=COLLECTED");
+  });
+
+  it("sends mark-collected and void to the collection endpoints", async () => {
+    const seen: string[] = [];
+    const fetchImpl = vi.fn(async (url: string | URL | Request, init?: RequestInit) => {
+      seen.push(`${init?.method} ${String(url)}`);
+      return jsonResponse({ id: "c1", status: "COLLECTED" }, 200);
+    });
+    const { client } = makeClient({
+      fetchImpl: fetchImpl as unknown as typeof fetch,
+      tokens: { accessToken: "a", refreshToken: "r" },
+    });
+    await client.kits.markCollected("o", "e", "c1");
+    await client.kits.void("o", "e", "c1");
+    expect(seen[0]).toContain("/kit-collections/c1/collect");
+    expect(seen[1]).toContain("/kit-collections/c1/void");
+  });
+});
+
 describe("apiKey", () => {
   function makeKeyClient(opts: {
     apiKey: string | (() => string | null | Promise<string | null>);
