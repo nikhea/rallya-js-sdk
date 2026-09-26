@@ -6,5 +6,6 @@ export { OrdersResource } from "./orders.js";
 export { PaymentsResource } from "./payments.js";
 export { AttendeesResource } from "./attendees.js";
 export { CheckinResource } from "./checkin.js";
+export { KitsResource } from "./kits.js";
 export { AuditResource, AdminResource, HealthResource } from "./misc.js";
 export type { AuditQuery } from "./misc.js";

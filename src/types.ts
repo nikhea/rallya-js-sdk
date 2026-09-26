@@ -85,6 +85,19 @@ export interface Attendee {
 export interface ScanResult { outcome: CheckinOutcome; method: CheckinMethod; attendeeId?: string; checkedInAt?: string }
 export interface CheckinStats { registered: number; checkedIn: number; cancelled: number; total: number }
 
+// --- Kits ---
+export type CollectionStatus = "PENDING" | "COLLECTED" | "VOIDED";
+export interface KitType {
+  id: string; eventId: string; name: string; description?: string;
+  quantityTotal: number; pending: number; collected: number; voided: number;
+  remaining: number; createdAt: string;
+}
+export interface KitCollection {
+  id: string; kitId: string; kitName?: string; eventId: string; attendeeId: string;
+  status: CollectionStatus; collectedAt?: string; collectedBy?: string; createdAt: string;
+}
+export interface KitCollectionFilter { kitId?: string; status?: CollectionStatus; attendeeId?: string }
+
 // --- Audit / Admin ---
 export interface AuditEvent {
   id: string; orgId?: string; actorId?: string; action: string;
