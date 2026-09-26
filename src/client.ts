@@ -9,6 +9,7 @@ import {
   AttendeesResource,
   CheckinResource,
   KitsResource,
+  SubscriptionsResource,
   AuditResource,
   AdminResource,
   HealthResource,
@@ -108,6 +109,7 @@ export class RallyaClient {
   readonly attendees: AttendeesResource;
   readonly checkin: CheckinResource;
   readonly kits: KitsResource;
+  readonly subscriptions: SubscriptionsResource;
   readonly audit: AuditResource;
   readonly admin: AdminResource;
   readonly health: HealthResource;
@@ -140,6 +142,7 @@ export class RallyaClient {
     this.attendees = new AttendeesResource(this);
     this.checkin = new CheckinResource(this);
     this.kits = new KitsResource(this);
+    this.subscriptions = new SubscriptionsResource(this);
     this.audit = new AuditResource(this);
     this.admin = new AdminResource(this);
     this.health = new HealthResource(this);

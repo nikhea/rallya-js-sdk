@@ -233,6 +233,20 @@ await client.kits.void("acme", "fest-2026", collectionId);          // frees re-
 await client.kits.listCollections("acme", "fest-2026", { status: "COLLECTED" });
 ```
 
+### Subscriptions (`client.subscriptions`)
+
+Org tiers (FREE/PRO/SCALE) gating organizer-side quotas and features.
+Attendee checkout stays one-off. Over-quota writes fail `402`
+(`UPGRADE_REQUIRED`); downgrades/cancels land at period end via the portal:
+
+```ts
+await client.subscriptions.listPlans(); // public catalog with limits + prices
+await client.subscriptions.get("acme"); // absent subscription reads FREE
+const { url } = await client.subscriptions.checkout("acme", "PRO"); // OWNER
+window.location.href = url;
+const { url: portal } = await client.subscriptions.portal("acme");  // OWNER
+```
+
 ### Audit / Admin / Health
 
 ```ts

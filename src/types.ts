@@ -98,6 +98,22 @@ export interface KitCollection {
 }
 export interface KitCollectionFilter { kitId?: string; status?: CollectionStatus; attendeeId?: string }
 
+// --- Subscriptions (org tiers; attendee checkout stays one-off) ---
+export type SubscriptionPlan = "FREE" | "PRO" | "SCALE";
+export type SubscriptionStatus = "ACTIVE" | "PAST_DUE" | "CANCELED";
+export interface PlanLimits {
+  maxEvents: number; maxMembers: number; maxAttendeesPerEvent: number; maxKitsPerEvent: number;
+}
+export interface SubscriptionTier {
+  plan: SubscriptionPlan; name: string; priceId?: string;
+  monthlyCents?: number; currency?: string;
+  limits: PlanLimits; features: string[];
+}
+export interface Subscription {
+  plan: SubscriptionPlan; status: SubscriptionStatus;
+  currentPeriodEnd?: string; cancelAtPeriodEnd: boolean;
+}
+
 // --- Audit / Admin ---
 export interface AuditEvent {
   id: string; orgId?: string; actorId?: string; action: string;
