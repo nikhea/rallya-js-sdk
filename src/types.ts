@@ -23,6 +23,18 @@ export interface Page<T> {
   perPage: number;
 }
 
+/**
+ * Backfill page/perPage from the request when the server omits them.
+ * Prefers explicit request values, then the server echo, then defaults (1/20).
+ */
+export function withPage<T>(q: PageQuery | undefined, page: Page<T>): Page<T> {
+  return {
+    ...page,
+    page: q?.page ?? page.page ?? 1,
+    perPage: q?.perPage ?? page.perPage ?? 20,
+  };
+}
+
 // --- Auth ---
 export interface RegisterInput { email: string; password: string; firstName?: string; lastName?: string }
 export interface LoginInput { email: string; password: string }

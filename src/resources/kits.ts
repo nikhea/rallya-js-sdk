@@ -81,7 +81,7 @@ export class KitsResource {
     orgIdOrSlug: string,
     eventIdOrSlug: string,
     filter?: KitCollectionFilter,
-  ): Promise<{ items: KitCollection[]; total: number }> {
+  ): Promise<{ items: KitCollection[]; total: number; page?: number; perPage?: number }> {
     return this.client.request(
       `orgs/${RallyaClient.seg(orgIdOrSlug)}/events/${RallyaClient.seg(eventIdOrSlug)}/kit-collections`,
       { method: "GET", query: filter as Record<string, string | number | undefined> },
@@ -94,7 +94,7 @@ export class KitsResource {
     eventIdOrSlug: string,
     kitId: string,
     filter?: { status?: string },
-  ): Promise<{ items: KitCollection[]; total: number }> {
+  ): Promise<{ items: KitCollection[]; total: number; page?: number; perPage?: number }> {
     return this.client.request(
       `orgs/${RallyaClient.seg(orgIdOrSlug)}/events/${RallyaClient.seg(eventIdOrSlug)}/kits/${RallyaClient.seg(kitId)}/collections`,
       { method: "GET", query: filter as Record<string, string | number | undefined> },

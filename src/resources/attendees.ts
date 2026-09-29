@@ -1,14 +1,16 @@
 import { RallyaClient } from "../client.js";
 import type { Attendee, Page, PageQuery } from "../types.js";
+import { withPage } from "../types.js";
 
 export class AttendeesResource {
   constructor(private readonly client: RallyaClient) {}
 
-  listMine(q?: PageQuery): Promise<Page<Attendee>> {
-    return this.client.request<Page<Attendee>>("attendees/mine", {
+  async listMine(q?: PageQuery): Promise<Page<Attendee>> {
+    const page = await this.client.request<Page<Attendee>>("attendees/mine", {
       method: "GET",
       query: q as Record<string, string | number | undefined>,
     });
+    return withPage(q, page);
   }
 
   getMine(attendeeId: string): Promise<Attendee> {
@@ -21,11 +23,12 @@ export class AttendeesResource {
     });
   }
 
-  listRoster(orgIdOrSlug: string, eventIdOrSlug: string, q?: PageQuery): Promise<Page<Attendee>> {
-    return this.client.request<Page<Attendee>>(
+  async listRoster(orgIdOrSlug: string, eventIdOrSlug: string, q?: PageQuery): Promise<Page<Attendee>> {
+    const page = await this.client.request<Page<Attendee>>(
       `orgs/${RallyaClient.seg(orgIdOrSlug)}/events/${RallyaClient.seg(eventIdOrSlug)}/attendees`,
       { method: "GET", query: q as Record<string, string | number | undefined> },
     );
+    return withPage(q, page);
   }
 
   addWalkIn(

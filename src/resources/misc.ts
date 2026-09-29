@@ -1,5 +1,6 @@
 import { RallyaClient } from "../client.js";
 import type { AuditEvent, Page, PageQuery, PolicyDiff } from "../types.js";
+import { withPage } from "../types.js";
 
 export interface AuditQuery extends PageQuery {
   action?: string;
@@ -14,29 +15,32 @@ export interface AuditQuery extends PageQuery {
 export class AuditResource {
   constructor(private readonly client: RallyaClient) {}
 
-  listOrg(orgIdOrSlug: string, q?: AuditQuery): Promise<Page<AuditEvent>> {
-    return this.client.request<Page<AuditEvent>>(`orgs/${RallyaClient.seg(orgIdOrSlug)}/audit`, {
+  async listOrg(orgIdOrSlug: string, q?: AuditQuery): Promise<Page<AuditEvent>> {
+    const page = await this.client.request<Page<AuditEvent>>(`orgs/${RallyaClient.seg(orgIdOrSlug)}/audit`, {
       method: "GET",
       query: q as Record<string, string | number | undefined>,
     });
+    return withPage(q, page);
   }
 
-  listPlatform(q?: AuditQuery): Promise<Page<AuditEvent>> {
-    return this.client.request<Page<AuditEvent>>("admin/audit", {
+  async listPlatform(q?: AuditQuery): Promise<Page<AuditEvent>> {
+    const page = await this.client.request<Page<AuditEvent>>("admin/audit", {
       method: "GET",
       query: q as Record<string, string | number | undefined>,
     });
+    return withPage(q, page);
   }
 }
 
 export class AdminResource {
   constructor(private readonly client: RallyaClient) {}
 
-  listOrgs(q?: PageQuery): Promise<Page<{ id: string; name: string; slug: string; members: number; createdAt: string }>> {
-    return this.client.request("admin/orgs", {
+  async listOrgs(q?: PageQuery): Promise<Page<{ id: string; name: string; slug: string; members: number; createdAt: string }>> {
+    const page = await this.client.request("admin/orgs", {
       method: "GET",
       query: q as Record<string, string | number | undefined>,
     });
+    return withPage(q, page as Page<{ id: string; name: string; slug: string; members: number; createdAt: string }>);
   }
 
   getOrg(id: string): Promise<unknown> {
@@ -49,22 +53,24 @@ export class AdminResource {
     });
   }
 
-  searchUsers(q?: PageQuery & { q?: string }): Promise<Page<unknown>> {
-    return this.client.request("admin/users", {
+  async searchUsers(q?: PageQuery & { q?: string }): Promise<Page<unknown>> {
+    const page = await this.client.request<Page<unknown>>("admin/users", {
       method: "GET",
       query: q as Record<string, string | number | undefined>,
     });
+    return withPage(q, page);
   }
 
   getUser(id: string): Promise<unknown> {
     return this.client.request(`admin/users/${RallyaClient.seg(id)}`, { method: "GET" });
   }
 
-  listUserOrders(id: string, q?: PageQuery): Promise<Page<unknown>> {
-    return this.client.request(`admin/users/${RallyaClient.seg(id)}/orders`, {
+  async listUserOrders(id: string, q?: PageQuery): Promise<Page<unknown>> {
+    const page = await this.client.request<Page<unknown>>(`admin/users/${RallyaClient.seg(id)}/orders`, {
       method: "GET",
       query: q as Record<string, string | number | undefined>,
     });
+    return withPage(q, page);
   }
 
   syncUserPolicies(id: string): Promise<PolicyDiff> {
