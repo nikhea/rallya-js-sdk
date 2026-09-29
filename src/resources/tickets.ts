@@ -1,18 +1,18 @@
 import { RallyaClient } from "../client.js";
-import type { CreateTicketInput, TicketType, UpdateTicketInput } from "../types.js";
+import type { CreateTicketInput, Page, TicketType, UpdateTicketInput } from "../types.js";
 
 export class TicketsResource {
   constructor(private readonly client: RallyaClient) {}
 
-  listPublic(eventIdOrSlug: string): Promise<TicketType[]> {
-    return this.client.request<TicketType[]>(`events/${RallyaClient.seg(eventIdOrSlug)}/tickets`, {
+  listPublic(eventIdOrSlug: string): Promise<Page<TicketType>> {
+    return this.client.request<Page<TicketType>>(`events/${RallyaClient.seg(eventIdOrSlug)}/tickets`, {
       method: "GET",
       auth: false,
     });
   }
 
-  list(orgIdOrSlug: string, eventIdOrSlug: string): Promise<TicketType[]> {
-    return this.client.request<TicketType[]>(
+  list(orgIdOrSlug: string, eventIdOrSlug: string): Promise<Page<TicketType>> {
+    return this.client.request<Page<TicketType>>(
       `orgs/${RallyaClient.seg(orgIdOrSlug)}/events/${RallyaClient.seg(eventIdOrSlug)}/tickets`,
       { method: "GET" },
     );

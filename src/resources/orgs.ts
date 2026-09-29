@@ -10,6 +10,7 @@ import type {
   Permission,
   UpdateOrgInput,
 } from "../types.js";
+import { withPage } from "../types.js";
 
 export class OrgsResource {
   constructor(private readonly client: RallyaClient) {}
@@ -34,11 +35,12 @@ export class OrgsResource {
     return this.client.request<void>(`orgs/${RallyaClient.seg(idOrSlug)}`, { method: "DELETE" });
   }
 
-  listMembers(idOrSlug: string, q?: PageQuery): Promise<Page<OrgMember>> {
-    return this.client.request<Page<OrgMember>>(`orgs/${RallyaClient.seg(idOrSlug)}/members`, {
+  async listMembers(idOrSlug: string, q?: PageQuery): Promise<Page<OrgMember>> {
+    const page = await this.client.request<Page<OrgMember>>(`orgs/${RallyaClient.seg(idOrSlug)}/members`, {
       method: "GET",
       query: q as Record<string, string | number | undefined>,
     });
+    return withPage(q, page);
   }
 
   addMember(idOrSlug: string, input: { email: string; role?: string }): Promise<OrgMember> {
@@ -76,11 +78,12 @@ export class OrgsResource {
     });
   }
 
-  listInvites(idOrSlug: string, q?: PageQuery): Promise<Page<OrgInvite>> {
-    return this.client.request<Page<OrgInvite>>(`orgs/${RallyaClient.seg(idOrSlug)}/invites`, {
+  async listInvites(idOrSlug: string, q?: PageQuery): Promise<Page<OrgInvite>> {
+    const page = await this.client.request<Page<OrgInvite>>(`orgs/${RallyaClient.seg(idOrSlug)}/invites`, {
       method: "GET",
       query: q as Record<string, string | number | undefined>,
     });
+    return withPage(q, page);
   }
 
   revokeInvite(idOrSlug: string, inviteId: string): Promise<void> {

@@ -1,5 +1,6 @@
 import { RallyaClient } from "../client.js";
 import type { CreateOrderInput, Order, Page, PageQuery } from "../types.js";
+import { withPage } from "../types.js";
 
 function idempotencyKey(): string {
   const c = globalThis.crypto as unknown as { randomUUID?: () => string } | undefined;
@@ -18,11 +19,12 @@ export class OrdersResource {
     });
   }
 
-  listMine(q?: PageQuery): Promise<Page<Order>> {
-    return this.client.request<Page<Order>>("orders/mine", {
+  async listMine(q?: PageQuery): Promise<Page<Order>> {
+    const page = await this.client.request<Page<Order>>("orders/mine", {
       method: "GET",
       query: q as Record<string, string | number | undefined>,
     });
+    return withPage(q, page);
   }
 
   get(orderId: string): Promise<Order> {

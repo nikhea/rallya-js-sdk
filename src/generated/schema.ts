@@ -2489,6 +2489,211 @@ export interface paths {
         };
         trace?: never;
     };
+    "/orgs/{id}/api-keys": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List API keys
+         * @description Key metadata (prefix/scopes, never hashes or raw secrets).
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Org UUID or slug */
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["orgdto.ApiKeysPage"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["orgdto.ErrorAlias"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["orgdto.ErrorAlias"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["orgdto.ErrorAlias"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        /**
+         * Create API key
+         * @description Mints a per-org secret for server-to-server SDK use. Raw key shown once.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Org UUID or slug */
+                    id: string;
+                };
+                cookie?: never;
+            };
+            /** @description Key payload */
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["orgdto.CreateApiKey"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["orgdto.ApiKeyCreated"];
+                    };
+                };
+                /** @description Validation error */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["orgdto.ErrorAlias"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["orgdto.ErrorAlias"];
+                    };
+                };
+                /** @description API keys cannot manage keys */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["orgdto.ErrorAlias"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["orgdto.ErrorAlias"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/orgs/{id}/api-keys/{keyId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Revoke API key
+         * @description Soft-revokes a key (row kept for audit). Idempotent.
+         */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Org UUID or slug */
+                    id: string;
+                    /** @description API key UUID */
+                    keyId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["orgdto.ErrorAlias"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["orgdto.ErrorAlias"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["orgdto.ErrorAlias"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/orgs/{id}/audit": {
         parameters: {
             query?: never;
@@ -3853,6 +4058,747 @@ export interface paths {
                 };
             };
         };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/orgs/{id}/events/{eventId}/kit-collections": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List handouts
+         * @description Filter by kitId, status (PENDING|COLLECTED|VOIDED), or attendeeId.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Kit UUID */
+                    kitId?: string;
+                    /** @description Collection status */
+                    status?: string;
+                    /** @description Attendee UUID */
+                    attendeeId?: string;
+                };
+                header?: never;
+                path: {
+                    /** @description Org UUID or slug */
+                    id: string;
+                    /** @description Event UUID or slug */
+                    eventId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["kitdto.CollectionListResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["kitdto.ErrorAlias"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["kitdto.ErrorAlias"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["kitdto.ErrorAlias"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["kitdto.ErrorAlias"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/orgs/{id}/events/{eventId}/kit-collections/{collectionId}/collect": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Mark a reserved handout collected
+         * @description PENDING -> COLLECTED with staff stamps. Anything else is 422.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Org UUID or slug */
+                    id: string;
+                    /** @description Event UUID or slug */
+                    eventId: string;
+                    /** @description Collection UUID */
+                    collectionId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["kitdto.CollectionResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["kitdto.ErrorAlias"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["kitdto.ErrorAlias"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["kitdto.ErrorAlias"];
+                    };
+                };
+                /** @description Unprocessable Entity */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["kitdto.ErrorAlias"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/orgs/{id}/events/{eventId}/kit-collections/{collectionId}/void": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Void a handout
+         * @description PENDING or COLLECTED -> VOIDED (frees re-issue). Anything else is 422.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Org UUID or slug */
+                    id: string;
+                    /** @description Event UUID or slug */
+                    eventId: string;
+                    /** @description Collection UUID */
+                    collectionId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["kitdto.CollectionResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["kitdto.ErrorAlias"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["kitdto.ErrorAlias"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["kitdto.ErrorAlias"];
+                    };
+                };
+                /** @description Unprocessable Entity */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["kitdto.ErrorAlias"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/orgs/{id}/events/{eventId}/kits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List kit types
+         * @description Every kit type for one event with live pending/collected/voided/remaining tallies.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Org UUID or slug */
+                    id: string;
+                    /** @description Event UUID or slug */
+                    eventId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["kitdto.KitResponse"][];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["kitdto.ErrorAlias"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["kitdto.ErrorAlias"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["kitdto.ErrorAlias"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        /**
+         * Define a kit type
+         * @description Named kit (merch/welcome pack) with a total quantity for one event.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Org UUID or slug */
+                    id: string;
+                    /** @description Event UUID or slug */
+                    eventId: string;
+                };
+                cookie?: never;
+            };
+            /** @description Kit definition */
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["kitdto.CreateKitRequest"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["kitdto.KitResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["kitdto.ErrorAlias"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["kitdto.ErrorAlias"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["kitdto.ErrorAlias"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["kitdto.ErrorAlias"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/orgs/{id}/events/{eventId}/kits/{kitId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete a kit type
+         * @description Refused while active (non-voided) collections exist — void them first.
+         */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Org UUID or slug */
+                    id: string;
+                    /** @description Event UUID or slug */
+                    eventId: string;
+                    /** @description Kit UUID */
+                    kitId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Deleted */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["kitdto.ErrorAlias"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["kitdto.ErrorAlias"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["kitdto.ErrorAlias"];
+                    };
+                };
+                /** @description Unprocessable Entity */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["kitdto.ErrorAlias"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        /**
+         * Update a kit type
+         * @description QuantityTotal cannot drop below the collected count (422).
+         */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Org UUID or slug */
+                    id: string;
+                    /** @description Event UUID or slug */
+                    eventId: string;
+                    /** @description Kit UUID */
+                    kitId: string;
+                };
+                cookie?: never;
+            };
+            /** @description Kit patch */
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["kitdto.UpdateKitRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["kitdto.KitResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["kitdto.ErrorAlias"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["kitdto.ErrorAlias"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["kitdto.ErrorAlias"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["kitdto.ErrorAlias"];
+                    };
+                };
+                /** @description Unprocessable Entity */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["kitdto.ErrorAlias"];
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/orgs/{id}/events/{eventId}/kits/{kitId}/collect": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Hand a kit to an attendee
+         * @description Attendee must be CHECKED_IN (422 otherwise). Collects immediately unless reserve=true holds a PENDING unit. IdempotencyKey makes tablet retries safe.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Org UUID or slug */
+                    id: string;
+                    /** @description Event UUID or slug */
+                    eventId: string;
+                    /** @description Kit UUID */
+                    kitId: string;
+                };
+                cookie?: never;
+            };
+            /** @description Attendee handout */
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["kitdto.CollectRequest"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["kitdto.CollectionResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["kitdto.ErrorAlias"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["kitdto.ErrorAlias"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["kitdto.ErrorAlias"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["kitdto.ErrorAlias"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["kitdto.ErrorAlias"];
+                    };
+                };
+                /** @description Unprocessable Entity */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["kitdto.ErrorAlias"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/orgs/{id}/events/{eventId}/kits/{kitId}/collections": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List handouts for one kit
+         * @description Optional ?status= filter (PENDING|COLLECTED|VOIDED).
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Collection status */
+                    status?: string;
+                };
+                header?: never;
+                path: {
+                    /** @description Org UUID or slug */
+                    id: string;
+                    /** @description Event UUID or slug */
+                    eventId: string;
+                    /** @description Kit UUID */
+                    kitId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["kitdto.CollectionListResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["kitdto.ErrorAlias"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["kitdto.ErrorAlias"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["kitdto.ErrorAlias"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["kitdto.ErrorAlias"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -5602,6 +6548,284 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/orgs/{id}/subscription": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Org billing state
+         * @description Plan, status, and period end. Absent subscription reads FREE.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Org UUID or slug */
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["subdto.SubscriptionResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["subdto.ErrorAlias"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["subdto.ErrorAlias"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/orgs/{id}/subscription/checkout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Start a subscription Checkout
+         * @description Stripe subscription-mode Checkout for PRO/SCALE. Downgrades and cancels run through the Customer Portal.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Org UUID or slug */
+                    id: string;
+                };
+                cookie?: never;
+            };
+            /** @description Target plan */
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["subdto.CheckoutRequest"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["subdto.CheckoutResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["subdto.ErrorAlias"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["subdto.ErrorAlias"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["subdto.ErrorAlias"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["subdto.ErrorAlias"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["subdto.ErrorAlias"];
+                    };
+                };
+                /** @description Service Unavailable */
+                503: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["subdto.ErrorAlias"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/orgs/{id}/subscription/portal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Customer Portal session
+         * @description Self-serve manage/cancel (downgrades land at period end).
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Org UUID or slug */
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["subdto.PortalResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["subdto.ErrorAlias"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["subdto.ErrorAlias"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["subdto.ErrorAlias"];
+                    };
+                };
+                /** @description Service Unavailable */
+                503: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["subdto.ErrorAlias"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/subscription/plans": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Subscription catalog
+         * @description Three tiers with quotas, feature flags, and monthly prices.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["subdto.TierResponse"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/webhooks/stripe": {
         parameters: {
             query?: never;
@@ -5798,6 +7022,10 @@ export interface components {
         };
         "attendeedto.AttendeesPage": {
             items?: components["schemas"]["attendeedto.Attendee"][];
+            /** @example 1 */
+            page?: number;
+            /** @example 20 */
+            perPage?: number;
             /** @example 2 */
             total?: number;
         };
@@ -6049,11 +7277,19 @@ export interface components {
         };
         "eventdto.EventsPage": {
             items?: components["schemas"]["eventdto.Event"][];
+            /** @example 1 */
+            page?: number;
+            /** @example 20 */
+            perPage?: number;
             /** @example 2 */
             total?: number;
         };
         "eventdto.ImagesPage": {
             items?: components["schemas"]["eventdto.EventImage"][];
+            /** @example 1 */
+            page?: number;
+            /** @example 20 */
+            perPage?: number;
             /** @example 3 */
             total?: number;
         };
@@ -6074,6 +7310,83 @@ export interface components {
             /** @example Summer Fest 2026 */
             title?: string;
             venue?: string;
+        };
+        "kitdto.CollectRequest": {
+            /** @example 550e8400-e29b-41d4-a716-446655440000 */
+            attendeeId?: string;
+            /** @example kit-req-001 */
+            idempotencyKey?: string;
+            /** @example false */
+            reserve?: boolean;
+        };
+        "kitdto.CollectionListResponse": {
+            items?: components["schemas"]["kitdto.CollectionResponse"][];
+            /** @example 1 */
+            page?: number;
+            /** @example 20 */
+            perPage?: number;
+            /** @example 40 */
+            total?: number;
+        };
+        "kitdto.CollectionResponse": {
+            /** @example 550e8400-e29b-41d4-a716-446655440000 */
+            attendeeId?: string;
+            /** @example 2026-09-20T10:00:00Z */
+            collectedAt?: string;
+            /** @example 550e8400-e29b-41d4-a716-446655440000 */
+            collectedBy?: string;
+            /** @example 2026-09-20T10:00:00Z */
+            createdAt?: string;
+            /** @example 550e8400-e29b-41d4-a716-446655440000 */
+            eventId?: string;
+            /** @example 550e8400-e29b-41d4-a716-446655440000 */
+            id?: string;
+            /** @example 550e8400-e29b-41d4-a716-446655440000 */
+            kitId?: string;
+            /** @example VIP pack */
+            kitName?: string;
+            /** @example COLLECTED */
+            status?: string;
+        };
+        "kitdto.CreateKitRequest": {
+            /** @example Lanyard, shirt, stickers */
+            description?: string;
+            /** @example VIP pack */
+            name?: string;
+            /** @example 100 */
+            quantityTotal?: number;
+        };
+        "kitdto.ErrorAlias": {
+            /** @example kit not found */
+            error?: string;
+        };
+        "kitdto.KitResponse": {
+            /** @example 40 */
+            collected?: number;
+            /** @example 2026-09-20T10:00:00Z */
+            createdAt?: string;
+            description?: string;
+            /** @example 550e8400-e29b-41d4-a716-446655440000 */
+            eventId?: string;
+            /** @example 550e8400-e29b-41d4-a716-446655440000 */
+            id?: string;
+            /** @example VIP pack */
+            name?: string;
+            /** @example 5 */
+            pending?: number;
+            /** @example 100 */
+            quantityTotal?: number;
+            /** @example 55 */
+            remaining?: number;
+            /** @example 1 */
+            voided?: number;
+        };
+        "kitdto.UpdateKitRequest": {
+            description?: string;
+            /** @example VIP pack */
+            name?: string;
+            /** @example 120 */
+            quantityTotal?: number;
         };
         "orderdto.CreateOrder": {
             /** @example order-req-001 */
@@ -6109,6 +7422,10 @@ export interface components {
         };
         "orderdto.OrdersPage": {
             items?: components["schemas"]["orderdto.Order"][];
+            /** @example 1 */
+            page?: number;
+            /** @example 20 */
+            perPage?: number;
             /** @example 3 */
             total?: number;
         };
@@ -6124,6 +7441,77 @@ export interface components {
              * @enum {string}
              */
             role?: "OWNER" | "ADMIN" | "MEMBER";
+        };
+        "orgdto.ApiKey": {
+            /** @example 2026-09-19T12:00:00Z */
+            createdAt?: string;
+            /** @example 1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d */
+            createdBy?: string;
+            /** @example 2027-01-01T00:00:00Z */
+            expiresAt?: string;
+            /** @example 3c4d5e6f-7081-9a0b-1c2d-3e4f5a6b7c8d */
+            id?: string;
+            /** @example 2026-09-20T12:00:00Z */
+            lastUsedAt?: string;
+            /** @example door-tablet-1 */
+            name?: string;
+            /** @example rk_live_ab12cd34 */
+            prefix?: string;
+            /** @example 2026-09-21T12:00:00Z */
+            revokedAt?: string;
+            /**
+             * @example [
+             *       "checkin:create"
+             *     ]
+             */
+            scopes?: string[];
+        };
+        "orgdto.ApiKeyCreated": {
+            /** @example 2026-09-19T12:00:00Z */
+            createdAt?: string;
+            /** @example 1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d */
+            createdBy?: string;
+            /** @example 2027-01-01T00:00:00Z */
+            expiresAt?: string;
+            /** @example 3c4d5e6f-7081-9a0b-1c2d-3e4f5a6b7c8d */
+            id?: string;
+            /** @example rk_live_abc123... */
+            key?: string;
+            /** @example 2026-09-20T12:00:00Z */
+            lastUsedAt?: string;
+            /** @example door-tablet-1 */
+            name?: string;
+            /** @example rk_live_ab12cd34 */
+            prefix?: string;
+            /** @example 2026-09-21T12:00:00Z */
+            revokedAt?: string;
+            /**
+             * @example [
+             *       "checkin:create"
+             *     ]
+             */
+            scopes?: string[];
+        };
+        "orgdto.ApiKeysPage": {
+            items?: components["schemas"]["orgdto.ApiKey"][];
+            /** @example 1 */
+            page?: number;
+            /** @example 20 */
+            perPage?: number;
+            /** @example 2 */
+            total?: number;
+        };
+        "orgdto.CreateApiKey": {
+            /** @example 2027-01-01T00:00:00Z */
+            expiresAt?: string;
+            /** @example door-tablet-1 */
+            name: string;
+            /**
+             * @example [
+             *       "checkin:create"
+             *     ]
+             */
+            scopes?: string[];
         };
         "orgdto.CreateOrg": {
             /** @example https://example.com/logo.png */
@@ -6181,6 +7569,10 @@ export interface components {
         "orgdto.InvitesPage": {
             items?: components["schemas"]["orgdto.Invite"][];
             /** @example 1 */
+            page?: number;
+            /** @example 20 */
+            perPage?: number;
+            /** @example 1 */
             total?: number;
         };
         "orgdto.Member": {
@@ -6199,6 +7591,10 @@ export interface components {
         };
         "orgdto.MembersPage": {
             items?: components["schemas"]["orgdto.Member"][];
+            /** @example 1 */
+            page?: number;
+            /** @example 20 */
+            perPage?: number;
             /** @example 2 */
             total?: number;
         };
@@ -6266,6 +7662,67 @@ export interface components {
             /** @example ok */
             message?: string;
         };
+        "subdto.CheckoutRequest": {
+            /** @example PRO */
+            plan?: string;
+        };
+        "subdto.CheckoutResponse": {
+            /** @example cs_test_123 */
+            sessionId?: string;
+            /** @example https://checkout.stripe.com/c/pay/cs_test_123 */
+            url?: string;
+        };
+        "subdto.ErrorAlias": {
+            /** @example UPGRADE_REQUIRED */
+            code?: string;
+            /** @example plan limit reached — upgrade required */
+            error?: string;
+        };
+        "subdto.Limits": {
+            /** @example 2000 */
+            maxAttendeesPerEvent?: number;
+            /** @example 25 */
+            maxEvents?: number;
+            /** @example 10 */
+            maxKitsPerEvent?: number;
+            /** @example 25 */
+            maxMembers?: number;
+        };
+        "subdto.PortalResponse": {
+            /** @example https://billing.stripe.com/p/session/test_123 */
+            url?: string;
+        };
+        "subdto.SubscriptionResponse": {
+            /** @example false */
+            cancelAtPeriodEnd?: boolean;
+            /** @example 2026-10-26T00:00:00Z */
+            currentPeriodEnd?: string;
+            /** @example PRO */
+            plan?: string;
+            /** @example ACTIVE */
+            status?: string;
+        };
+        "subdto.TierResponse": {
+            /** @example usd */
+            currency?: string;
+            /**
+             * @example [
+             *       "custom_roles",
+             *       "api_keys",
+             *       "kits"
+             *     ]
+             */
+            features?: string[];
+            limits?: components["schemas"]["subdto.Limits"];
+            /** @example 2900 */
+            monthlyCents?: number;
+            /** @example Pro */
+            name?: string;
+            /** @example PRO */
+            plan?: string;
+            /** @example price_123 */
+            priceId?: string;
+        };
         "ticketdto.CreateTicket": {
             /** @example USD */
             currency?: string;
@@ -6329,6 +7786,10 @@ export interface components {
         };
         "ticketdto.TicketsPage": {
             items?: components["schemas"]["ticketdto.TicketType"][];
+            /** @example 1 */
+            page?: number;
+            /** @example 20 */
+            perPage?: number;
             /** @example 2 */
             total?: number;
         };

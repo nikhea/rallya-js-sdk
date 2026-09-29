@@ -29,6 +29,45 @@ function makeClient(opts: {
   return { client, setSpy, getTokens: () => tokens };
 }
 
+describe("pagination", () => {
+  it("backfills page/perPage from the request when the server omits them", async () => {
+    const fetchImpl = vi.fn(async () => jsonResponse({ items: [], total: 0 }, 200));
+    const { client } = makeClient({
+      fetchImpl: fetchImpl as unknown as typeof fetch,
+      tokens: { accessToken: "a", refreshToken: "r" },
+    });
+    const withQuery = await client.orders.listMine({ page: 3, perPage: 50 });
+    expect(withQuery.page).toBe(3);
+    expect(withQuery.perPage).toBe(50);
+    const defaults = await client.orders.listMine();
+    expect(defaults.page).toBe(1);
+    expect(defaults.perPage).toBe(20);
+  });
+
+  it("prefers the server echo when present", async () => {
+    const fetchImpl = vi.fn(async () => jsonResponse({ items: [], total: 0, page: 2, perPage: 10 }, 200));
+    const { client } = makeClient({
+      fetchImpl: fetchImpl as unknown as typeof fetch,
+      tokens: { accessToken: "a", refreshToken: "r" },
+    });
+    const page = await client.orders.listMine();
+    expect(page.page).toBe(2);
+    expect(page.perPage).toBe(10);
+  });
+
+  it("returns ticket lists as pages", async () => {
+    const fetchImpl = vi.fn(async () => jsonResponse({ items: [], total: 0, page: 1, perPage: 20 }, 200));
+    const { client } = makeClient({
+      fetchImpl: fetchImpl as unknown as typeof fetch,
+      tokens: { accessToken: "a", refreshToken: "r" },
+    });
+    const page = await client.tickets.listPublic("fest-2026");
+    expect(page.items).toEqual([]);
+    expect(page.total).toBe(0);
+    expect(page.page).toBe(1);
+  });
+});
+
 describe("errors", () => {
   it("maps {error, code} envelope with status", async () => {
     const fetchImpl = vi.fn(async () => jsonResponse({ error: "email not verified", code: "EMAIL_NOT_VERIFIED" }, 403));

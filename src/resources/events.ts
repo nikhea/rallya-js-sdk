@@ -1,5 +1,6 @@
 import { RallyaClient } from "../client.js";
 import type { CreateEventInput, EventFilter, EventImage, Page, RallyaEvent, UpdateEventInput } from "../types.js";
+import { withPage } from "../types.js";
 
 const MAX_COVER_BYTES = 5 * 1024 * 1024;
 
@@ -21,12 +22,13 @@ export class EventsResource {
   constructor(private readonly client: RallyaClient) {}
 
   /** Public discovery (published only, no auth needed but harmless with it). */
-  listPublic(filter?: EventFilter): Promise<Page<RallyaEvent>> {
-    return this.client.request<Page<RallyaEvent>>("events", {
+  async listPublic(filter?: EventFilter): Promise<Page<RallyaEvent>> {
+    const page = await this.client.request<Page<RallyaEvent>>("events", {
       method: "GET",
       query: filter as Record<string, string | number | undefined>,
       auth: false,
     });
+    return withPage(filter, page);
   }
 
   getPublic(idOrSlug: string): Promise<RallyaEvent> {
@@ -36,11 +38,12 @@ export class EventsResource {
     });
   }
 
-  listOrg(orgIdOrSlug: string, q?: EventFilter): Promise<Page<RallyaEvent>> {
-    return this.client.request<Page<RallyaEvent>>(`orgs/${RallyaClient.seg(orgIdOrSlug)}/events`, {
+  async listOrg(orgIdOrSlug: string, q?: EventFilter): Promise<Page<RallyaEvent>> {
+    const page = await this.client.request<Page<RallyaEvent>>(`orgs/${RallyaClient.seg(orgIdOrSlug)}/events`, {
       method: "GET",
       query: q as Record<string, string | number | undefined>,
     });
+    return withPage(q, page);
   }
 
   create(orgIdOrSlug: string, input: CreateEventInput): Promise<RallyaEvent> {
@@ -116,10 +119,11 @@ export class EventsResource {
     );
   }
 
-  listImages(orgIdOrSlug: string, eventIdOrSlug: string): Promise<Page<EventImage>> {
-    return this.client.request<Page<EventImage>>(
+  async listImages(orgIdOrSlug: string, eventIdOrSlug: string): Promise<Page<EventImage>> {
+    const page = await this.client.request<Page<EventImage>>(
       `orgs/${RallyaClient.seg(orgIdOrSlug)}/events/${RallyaClient.seg(eventIdOrSlug)}/images`,
       { method: "GET" },
     );
+    return withPage(undefined, page);
   }
 }
